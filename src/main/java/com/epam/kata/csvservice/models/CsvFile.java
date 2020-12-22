@@ -11,6 +11,21 @@ public class CsvFile {
 	private String fileUrl;
 	@NonNull
 	private boolean isLocal;
+	private String separation;
+	private String name;
+	
+	public String getSeparation() {
+		return separation;
+	}
+	public void setSeparation(String separation) {
+		this.separation = separation;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	public String getFileUrl() {
 		return fileUrl;
 	}

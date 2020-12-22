@@ -16,8 +16,6 @@ import com.epam.kata.csvservice.models.CsvFile;
 @Service
 public class CsvServiceImpl implements CsvService {
 
-	private CsvFileLoadStrategy csvFileLoadStrategy;
-
 	@Autowired
 	private CsvProcessorClient csvProcessingClient;
 
@@ -32,6 +30,8 @@ public class CsvServiceImpl implements CsvService {
 		CsvFile file = new CsvFile();
 		file.setFileUrl(fileUrl);
 		file.setLocal(isLocal);
+		file.setSeparation(",");
+		file.setName("");
 		return csvProcessingClient.getColumnNamesHavingNullOrEmptyValues(createCsvFileObjectForClient(file));
 	}
 
@@ -39,7 +39,20 @@ public class CsvServiceImpl implements CsvService {
 		CsvClientFileRequest fileObject = new CsvClientFileRequest();
 		fileObject.setFileUrl(csvFile.getFileUrl());
 		fileObject.setLocal(csvFile.isLocal());
+		fileObject.setSeparation(csvFile.getSeparation());
+		fileObject.setName(csvFile.getName());
 		return fileObject;
+	}
+
+	@Override
+	public void writeCsvFile(List<CsvFileObject> file) throws FileNotFoundException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean deleteRowByName(CsvFile csvFile) throws FileNotFoundException {
+		return csvProcessingClient.deleteRowByName(createCsvFileObjectForClient(csvFile));
 	}
 
 }

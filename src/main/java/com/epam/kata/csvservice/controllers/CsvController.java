@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,14 +34,20 @@ public class CsvController {
 		}
 	}
 	
-	@PostMapping("/sort")
-	public Integer sortAndCreateACSVFile(@RequestBody @Validated CsvFile csvFile) {
+	@DeleteMapping("/delete")
+	public ResponseEntity<String> deleteContentFromCSVFileForAName(@RequestBody @Validated CsvFile csvFile) {
 		try {
-			return csvService.loadCsvFile(csvFile);
+			boolean isDeleted= csvService.deleteRowByName(csvFile);
+			if(isDeleted) {
+				return ResponseEntity.ok("deleted");
+			} else
+				return ResponseEntity.ok("Not Deleted");
 		} catch (FileNotFoundException e) {
-			return 0;
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	
 
 	@GetMapping("/emptyValue")
 	public boolean getNullOrEmptyValueColumnNames(@RequestParam("fileUrl") String fileUrl,
