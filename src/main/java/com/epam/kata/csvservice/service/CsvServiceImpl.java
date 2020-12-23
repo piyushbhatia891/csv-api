@@ -8,51 +8,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.epam.kata.csv_processor.client.CsvProcessorClient;
+import com.epam.kata.csv_processor.client.ProcessingClient;
+import com.epam.kata.csv_processor.exceptions.CsvProcessorException;
 import com.epam.kata.csv_processor.models.CsvClientFileRequest;
 import com.epam.kata.csv_processor.models.CsvFileObject;
-import com.epam.kata.csvservice.exceptions.FilePathNotFoundException;
+import com.epam.kata.csv_processor.service.CsvFileLoadStrategy;
+import com.epam.kata.csv_processor.service.LoadLocalFile;
+import com.epam.kata.csv_processor.service.Separator;
 import com.epam.kata.csvservice.models.CsvFile;
 
 @Service
 public class CsvServiceImpl implements CsvService {
 
-	@Autowired
-	private CsvProcessorClient csvProcessingClient;
-
 	@Override
-	public List<CsvFileObject> loadCsvFile(CsvFile csvFile) throws FileNotFoundException {
-		return csvProcessingClient.loadCsvFile(createCsvFileObjectForClient(csvFile));
+	public void loadCsvFile(CsvFile csvFile) throws CsvProcessorException {
+		ProcessingClient csvProcessingClient = new CsvProcessorClient();
+		CsvFileLoadStrategy csvFileLoadStrategy = new LoadLocalFile();
+		csvFileLoadStrategy.setCustomOperation(null);
+		csvFileLoadStrategy.setSeparation(Separator.COMMA);
+		csvProcessingClient.loadCsvFile(csvFileLoadStrategy, createCsvFileObjectForClient(csvFile));
 
-	}
-
-	@Override
-	public boolean getColumnNamesHavingNullOrEmptyValues(String fileUrl, boolean isLocal) throws FileNotFoundException {
-		CsvFile file = new CsvFile();
-		file.setFileUrl(fileUrl);
-		file.setLocal(isLocal);
-		file.setSeparation(",");
-		file.setName("");
-		return csvProcessingClient.getColumnNamesHavingNullOrEmptyValues(createCsvFileObjectForClient(file));
 	}
 
 	private CsvClientFileRequest createCsvFileObjectForClient(CsvFile csvFile) {
-		CsvClientFileRequest fileObject = new CsvClientFileRequest();
-		fileObject.setFileUrl(csvFile.getFileUrl());
-		fileObject.setLocal(csvFile.isLocal());
-		fileObject.setSeparation(csvFile.getSeparation());
-		fileObject.setName(csvFile.getName());
-		return fileObject;
-	}
+		return new CsvClientFileRequest.CsvClientFileRequestBuilder(csvFile.getFileUrl()).build();
 
-	@Override
-	public void writeCsvFile(List<CsvFileObject> file) throws FileNotFoundException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean deleteRowByName(CsvFile csvFile) throws FileNotFoundException {
-		return csvProcessingClient.deleteRowByName(createCsvFileObjectForClient(csvFile));
 	}
 
 }

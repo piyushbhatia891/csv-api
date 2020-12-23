@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.epam.kata.csv_processor.exceptions.CsvProcessorException;
 import com.epam.kata.csvservice.models.CsvFile;
 import com.epam.kata.csvservice.service.CsvService;
 
@@ -28,42 +29,10 @@ public class CsvController {
 	public ResponseEntity<String> loadCSVFile(@RequestBody @Validated CsvFile csvFile) {
 		try {
 			csvService.loadCsvFile(csvFile);
-			return new ResponseEntity<>(HttpStatus.OK);
-		} catch (FileNotFoundException e) {
+			return new ResponseEntity<>(HttpStatus.OK).ok("Thanks The File Submitted");
+		} catch (CsvProcessorException e) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
 	
-	@DeleteMapping("/delete")
-	public ResponseEntity<String> deleteContentFromCSVFileForAName(@RequestBody @Validated CsvFile csvFile) {
-		try {
-			boolean isDeleted= csvService.deleteRowByName(csvFile);
-			if(isDeleted) {
-				return ResponseEntity.ok("deleted");
-			} else
-				return ResponseEntity.ok("Not Deleted");
-		} catch (FileNotFoundException e) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-	}
-	
-	
-
-	@GetMapping("/emptyValue")
-	public boolean getNullOrEmptyValueColumnNames(@RequestParam("fileUrl") String fileUrl,
-			@RequestParam("isLocal") boolean isLocal) {
-		try {
-			if (csvService.getColumnNamesHavingNullOrEmptyValues(fileUrl, isLocal))
-				return true;
-			else 
-				return false;
-		} catch (FileNotFoundException e) {
-			return false;
-		}
-	}
-	
-	
-	
-	
-
 }
